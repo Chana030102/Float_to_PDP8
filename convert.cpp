@@ -12,17 +12,20 @@
  *    Location 2 = |Sign|sig Higher 11|
  *    Location 3 = |sig Lower 12   |
  * 
- * Converter can be either fed a number on the commandline upon startup,
- * fed a file with ONLY floating point numbers, or no arguments for
- * endless user entry (which can be ended with Ctrl+D).
+ * With no arguments, converter will continuously accept user
+ * input of float numbers and output as octal.
+ *
+ * If a float number is used as an argument, converter will only
+ * convert that and end. 
  *
  * Commandline Flags:
- *    -o    outputs bits in octal
+ *    -b    outputs bits in binary
  *    -h    outputs bits in hex 
+ *    -o    outputs bits in octal
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
-#include <fstream>
 #include <string.h>
 using namespace std;
 
@@ -36,6 +39,67 @@ typedef union {
         unsigned int sign: 1;
     }parts;
 }float_cast;
+
+void out_binary(float_cast x, unsigned int a, unsigned int b);
+
+int main(int argc, char *argv[])
+{
+    float_cast to_operate;
+    unsigned int a, b;
+    int format = 0;
+    
+    if(argc > 1)
+    {
+        // Determine output format or convert given float number
+        if(strcmp(argv[1],"-h")==0)
+            format = 1;
+        else if(strcmp(argv[1],"-b")==0)
+            format = 2;
+        else if(strcmp(argv[1],"-o")==0)
+            format = 0;
+        else
+        {
+            to_operate.f = atof(argv[1]);
+            a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
+            b = (1 << 12) & to_operate.parts.sig;
+            printf("%o\n%o\n%o\n\n",to_operate.parts.exponent,a,b); 
+            return 0;
+        }
+
+        if(argc == 3) // convert provided float number with desired format
+        {
+            to_operate.f = atof(argv[2]);
+            a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
+            b = (1 << 12) & to_operate.parts.sig;
+            
+            if(format == 1) // output as hex
+                printf("%x\n%x\n%x\n\n",to_operate.parts.exponent,a,b);
+            else if(format == 2) // output as binary
+                out_binary(to_operate,a,b);
+            else // default output as octal 
+                printf("%o\n%o\n%o\n\n",to_operate.parts.exponent,a,b); 
+            
+            return 0;
+        }
+        
+    }
+    
+    while(!cin.eof()) // get user input until Ctrl+D
+    {
+        cin >> to_operate.f;
+        a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
+        b = (1 << 12) & to_operate.parts.sig;
+
+        if(format == 1) // output as hex
+            printf("%x\n%x\n%x\n\n",to_operate.parts.exponent,a,b);
+        else if(format == 2) // output as binary
+            out_binary(to_operate,a,b);
+        else // default output as octal 
+            printf("%o\n%o\n%o\n\n",to_operate.parts.exponent,a,b); 
+    }
+    return 0;
+
+}
 
 // Output floating point in binary
 void out_binary(float_cast x, unsigned int a, unsigned int b)
@@ -52,50 +116,4 @@ void out_binary(float_cast x, unsigned int a, unsigned int b)
     for(i=0;i<12;i++) // significand lower 12 bits
         cout << ((b >> (SYS_BITS-1-i)) & 1);
     cout << endl << endl;
-}
-
-/*
-printf("%o\n%o\n%o\n\n",x.parts.exponent,a,b);
-*/
-int main(int argc, char *argv[])
-{
-    float_cast to_operate;
-    unsigned int a, b;
-    if(argc == 1)
-    {
-        cout << "Input IEEE-754 floating point numbers to convert to PDP-8.\n";
-        while(!cin.eof())
-        {
-            cin >> to_operate.f;
-            a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
-            b = (1 << 12) & to_operate.parts.sig;
-            out_binary(to_operate,a,b);
-        }
-    }
-    else if (argc == 2) 
-    {
-        if(strcmp(argv[1],"-h")==0)
-        {
-            while(!cin.eof())
-            {
-                cin >> to_operate.f;
-                a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
-                b = (1 << 12) & to_operate.parts.sig;
-                printf("%x\n%x\n%x\n\n",to_operate.parts.exponent,a,b);
-            }
-        }
-        else if(strcmp(argv[1],"-o")==0)
-        {
-            while(!cin.eof())
-            {
-                cin >> to_operate.f;
-                a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
-                b = (1 << 12) & to_operate.parts.sig;
-                printf("%o\n%o\n%o\n\n",to_operate.parts.exponent,a,b);
-            }
-        }
-    }
-
-    return 0;
-
 }
