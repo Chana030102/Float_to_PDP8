@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <string.h>
+#include <math.h>
 using namespace std;
 
 #define SYS_BITS 12
@@ -60,6 +61,14 @@ int main(int argc, char *argv[])
         else
         {
             to_operate.f = atof(argv[1]);
+            if(isinf(to_operate.f))
+            {
+                to_operate.parts.sig = 0;
+                to_operate.parts.exponent = 255;
+            }
+            else if(isnan(to_operate.f))
+                to_operate.parts.exponent = 255;
+
             a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
             b = (1 << 12) & to_operate.parts.sig;
             printf("%o\n%o\n%o\n\n",to_operate.parts.exponent,a,b); 
@@ -69,6 +78,15 @@ int main(int argc, char *argv[])
         if(argc == 3) // convert provided float number with desired format
         {
             to_operate.f = atof(argv[2]);
+            
+            if(isinf(to_operate.f))
+            {
+                to_operate.parts.sig = 0;
+                to_operate.parts.exponent = 255;
+            }
+            else if(isnan(to_operate.f))
+                to_operate.parts.exponent = 255;
+            
             a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
             b = (1 << 12) & to_operate.parts.sig;
             
@@ -87,6 +105,15 @@ int main(int argc, char *argv[])
     while(!cin.eof()) // get user input until Ctrl+D
     {
         cin >> to_operate.f;
+        
+        if(isinf(to_operate.f))
+        {
+            to_operate.parts.sig = 0;
+            to_operate.parts.exponent = 255;
+        }
+        else if(isnan(to_operate.f))
+            to_operate.parts.exponent = 255;
+        
         a = (to_operate.parts.sign << 11) | (to_operate.parts.sig >> 12);
         b = (1 << 12) & to_operate.parts.sig;
 
@@ -117,3 +144,4 @@ void out_binary(float_cast x, unsigned int a, unsigned int b)
         cout << ((b >> (SYS_BITS-1-i)) & 1);
     cout << endl << endl;
 }
+
