@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     char *octalformat = "%04o\n";
     char *hexformat = "%03x\n";
     char *format = octalformat;
-    char *op;
+    char op;
     int i, flag = 0;
 
     if(argc > 3) // Too many arguments
@@ -73,13 +73,13 @@ int main(int argc, char **argv)
         fprintf(stdout,"Specify floating point operation you want:\n");
         fprintf(stdout,"\tm for multiply\n\ta for addition\n\tq to exit\n");
         
-        scanf("%c",op);
+        scanf("%c",&op);
         getchar();
-        if(!strncmp("q",op,1))
+        if(!strncmp("q",&op,1))
             exit(1);
-        else if(!strncmp("m",op,1))
+        else if(!strncmp("m",&op,1))
             flag = 1;
-        else if(!strncmp("a",op,1))
+        else if(!strncmp("a",&op,1))
             flag = 2;
         else 
         {
