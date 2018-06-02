@@ -1,10 +1,9 @@
 
-all: convert
 
-convert: convert.cpp
-	g++ -Wall -g -o convert convert.cpp
+op_convert: op_convert.c
+	gcc -g -Wall -o op_convert op_convert.c
 
-clean: 
-	rm -f convert
+clean:
+	rm -f op_convert
 
 
