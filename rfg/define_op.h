@@ -47,7 +47,10 @@ void usage() {
 // Generate floating point within provided range
 float rfg(float range)
 {
-    return ((float)rand()/(float)RAND_MAX) * range;
+    if( (rand() % 100) < 50)
+        return ((float)rand()/(float)RAND_MAX) * range * -1;
+    else
+        return ((float)rand()/(float)RAND_MAX) * range;
 }
 
 // Prompt user what operation they would like to perform
@@ -133,3 +136,4 @@ void input_op(int flag)
         fprintf(stdout,"\n");
     }
 }
+
