@@ -5,7 +5,8 @@
  */
 #include "define_op.h"
 
-#define MAX 200
+#define MAX 100
+#define CODED 7
 
 //============== Assembly Program Strings =================
 char *symboldef = "FPCLAC= 6550\n"
@@ -36,24 +37,43 @@ char * constants_mult ="a, 0\n0\n0\n" // 0
                   "201\n300\n1123\n"
                   "0\n4000\n0\n"
                   "377\n0111\n1111\n"
-                  "201\n5000\n223\n"
+                  "201\n3000\n0\n"
                   "0\n4000\n0\n"
-                  "201\n5000\n223\n"
+                  "201\n3000\n0\n"
                   "0\n0\n0\n"
-                  "0\n0\n0\n";
+                  "0\n0\n0\n"
+                  "376\n3700\n0\n"
+                  "376\n3700\n0\n"
+                  "0\n4000\n0\n"
+                  "376\n3700\n0\n"
+                  "177\n0\n0\n"
+                  "376\n3700\n0\n"
+                  "1\n0\n1\n"
+                  "1\n4052\n5436\n"
+                  "0\n4000\n0\n";
+
 
 char * constants_add ="a, 0\n0\n0\n" // 0
                   "b, 200\n0\n0\n"    // 2
                   "c, 200\n0\n0\n"    // expect 2
                   "000\n000\n0111\n"
-                  "201\n300\n1123\n"
+                  "201\n3000\n0\n"
                   "0\n4000\n0\n"
                   "377\n0111\n1111\n"
-                  "201\n5000\n223\n"
+                  "201\n3000\n0\n"
                   "0\n4000\n0\n"
-                  "201\n5000\n223\n"
+                  "201\n3000\n0\n"
                   "0\n0\n0\n"
-                  "0\n0\n0\n";
+                  "0\n0\n0\n"
+                  "376\n3700\n0\n"
+                  "376\n3700\n0\n"
+                  "0\n4000\n0\n"
+                  "376\n3700\n0\n"
+                  "177\n0\n0\n"
+                  "376\n3700\n0\n"
+                  "1\n0\n1\n"
+                  "1\n4052\n5436\n"
+                  "0\n4000\n0\n";
 //===============================
 void print_file(FILE *fp, char *format, unsigned int n);
 
@@ -91,7 +111,7 @@ int main(int argc, char **argv )
         fprintf(fp,"%s",fpadd);
     fprintf(fp,"%s",LoopHalf2);
     
-    fprintf(fp,"count, %o\n",MAX+4);
+    fprintf(fp,"count, %o\n",MAX+CODED);
     
     if(flag == 1)
         fprintf(fp,"%s",constants_mult);
@@ -109,6 +129,10 @@ int main(int argc, char **argv )
             result.f = Op1.f * Op2.f;
         else          // FPADD
             result.f = Op1.f + Op2.f;
+
+        if(!isnormal(result.f))
+            result.f = -0;
+
         print(format, Op1.n);
         print(format, Op2.n);
         print(format, result.n);
@@ -124,6 +148,7 @@ int main(int argc, char **argv )
     }
     fprintf(fp,"$Main");
     fclose(fp);
+    fprintf(stdout,"\n\nAssembly Program generated: %s\n\n\n", argv[2]);
     return 0;
 }
 
